@@ -1,0 +1,13 @@
+main {
+    margin: auto;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(5, 50px);
+    grid-template-rows: repeat(10, 50px);
+}
+
+.cell {
+    border: 1px solid #999;
+}
