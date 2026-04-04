@@ -1,0 +1,1 @@
+body{justify-content:center;display:grid}.grid{grid-template-rows:repeat(10,60px);grid-template-columns:repeat(5,60px);display:grid}.cell{cursor:pointer;border:1px solid #999;justify-content:center;align-items:center;display:flex}.cell.selected{font-weight:700;text-decoration:underline}.cell.reachable{background-color:#e0f0ff}
