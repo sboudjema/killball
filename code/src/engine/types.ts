@@ -7,6 +7,7 @@ export type Unit = {
   id: UnitId;
   owner: PlayerId;
   pos: Position;
+  initialPos: Position;
   ma: number; //movement allowance
 };
 
@@ -17,6 +18,7 @@ export type GameState = {
     state: TurnState,
   };
   units: Record<UnitId, Unit>;
+  score: Record<PlayerId, number>;
 };
 
 export enum MoveError {

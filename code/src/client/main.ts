@@ -1,20 +1,19 @@
-import { getReachableTiles } from '../game/move';
-import { Action } from '../game/types';
-import type { GameState, ProtocolResponse, Position } from '../game/types';
+import { getReachableTiles } from '../engine/rules/movement/move';
+import { Action } from '../engine/types';
+import { GRID_ROWS, GRID_COLUMNS } from '../engine/constants';
+import type { GameState, ProtocolResponse, Position } from '../engine/types';
 
 const grid = document.getElementById('grid')!;
 const errors = document.getElementById('errors')!;
 const currentPlayer = document.getElementById('current-player')!;
-
-const COLUMNS = 5;
-const ROWS = 10;
+const scoreEl = document.getElementById('score')!;
 
 let selectedUnit: string | null = null;
 let currentState: GameState | null = null;
 
 // build grid
-for (let y = 0; y < ROWS; y++) {
-  for (let x = 0; x < COLUMNS; x++) {
+for (let y = 0; y < GRID_ROWS; y++) {
+  for (let x = 0; x < GRID_COLUMNS; x++) {
     const cell = document.createElement('div');
     cell.className = 'cell';
     cell.dataset.x = String(x);
@@ -25,20 +24,21 @@ for (let y = 0; y < ROWS; y++) {
 
 // click handler
 grid.addEventListener('click', (e) => {
-  const cell = e.target as HTMLElement;
-  if (!cell.classList.contains('cell')) return;
+  const cell = (e.target as HTMLElement).closest('.cell') as HTMLElement | null;
+  if (!cell) return;
 
   const x = Number(cell.dataset.x);
   const y = Number(cell.dataset.y);
-  const unitOnTile = cell.textContent;
+  const unitDiv = cell.querySelector('.unit');
+  const unitOnTile = unitDiv?.textContent ?? null;
 
   if (unitOnTile) {
     selectedUnit = unitOnTile;
     document.querySelectorAll('.cell').forEach(c => {
-      c.classList.remove('selected');
+      c.querySelector('.unit')?.classList.remove('selected');
       c.classList.remove('reachable');
     });
-    cell.classList.add('selected');
+    unitDiv!.classList.add('selected');
     if (currentState) {
       getReachableTiles(currentState, selectedUnit).forEach(({ x, y }) => {
         const tile = document.querySelector<HTMLElement>(`.cell[data-x="${x}"][data-y="${y}"]`);
@@ -53,10 +53,12 @@ grid.addEventListener('click', (e) => {
 function refresh(result: ProtocolResponse) {
   currentState = result.state;
   currentPlayer.textContent = `Current player: ${result.state.turn.player}`;
+  scoreEl.textContent = Object.entries(result.state.score)
+    .map(([player, score]) => `${player}: ${score}`)
+    .join(' | ');
   // clear all cells
   document.querySelectorAll('.cell').forEach(cell => {
-    cell.textContent = '';
-    cell.classList.remove('selected');
+    cell.querySelector('.unit')?.remove();
     cell.classList.remove('reachable');
   });
   // render units
@@ -64,8 +66,12 @@ function refresh(result: ProtocolResponse) {
     const selector = `.cell[data-x="${unit.pos.x}"][data-y="${unit.pos.y}"]`;
     const cell = document.querySelector(selector);
     if (!cell) return;
-    cell.textContent = unit.id;
-    cell.classList.toggle('selected', selectedUnit === unit.id);
+    const unitDiv = document.createElement('div');
+    unitDiv.className = 'unit';
+    unitDiv.classList.add(unit.owner.toLowerCase());
+    unitDiv.textContent = unit.id;
+    unitDiv.classList.toggle('selected', selectedUnit === unit.id);
+    cell.appendChild(unitDiv);
   });
   if (result.errors) {
     errors.textContent = String(result.errors);

@@ -17,11 +17,19 @@ body {
     border: 1px solid #999;
 }
 
-.cell.selected {
-    text-decoration: underline;
-    font-weight: bold;
-}
-
 .cell.reachable {
     background-color: #e0f0ff;
+}
+
+
+.p1 {
+    color: blue;
+}
+
+.p2 {
+    color: red;
+}
+
+.unit.selected {
+    text-decoration: underline;
 }

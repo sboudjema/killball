@@ -1,7 +1,5 @@
-import { GameState, ProtocolResponse, MoveError, Position } from "./types";
-
-const GRID_COLUMNS = 5;
-const GRID_ROWS = 10;
+import { GameState, ProtocolResponse, MoveError, Position } from "../../types";
+import { GRID_ROWS, GRID_COLUMNS } from "../../constants";
 
 function validateMove(state: GameState, unitId: string, pos: Position): MoveError[] {
   const errors: MoveError[] = [];

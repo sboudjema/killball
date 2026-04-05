@@ -1,6 +1,6 @@
 import express,  { Request, Response } from "express";
-import { submitAction } from "./game/turn";
-import { GameState, TurnState, Action, ProtocolRequest, ProtocolResponse, ProtocolError } from "./game/types"
+import { processAction } from "../engine/processAction";
+import { GameState, TurnState, Action, ProtocolRequest, ProtocolResponse, ProtocolError } from "../engine/types"
 const app = express();
 const PORT = 3000
 
@@ -14,16 +14,12 @@ let gameState: GameState = {
     state: TurnState.WaitingForAction,
   },
   units: {
-    u1: { id: 'u1', owner: 'P1', pos: { x: 2, y: 0 }, ma: 3 },
-    u2: { id: 'u2', owner: 'P2', pos: { x: 2, y: 9 }, ma: 3 },
-  }
-};
-
-const actionProcessors: Record<Action, (state: GameState, playerId: string, args: unknown) => ProtocolResponse> = {
-  [Action.Move]: (state, playerId, args) => {
-    const { unitId, pos } = args as { unitId: string; pos: { x: number; y: number } };
-    return submitAction(state, playerId, { type: 'move', unitId, pos });
+    a1: { id: 'a1', owner: 'P1', pos: { x: 1, y: 0 }, initialPos: { x: 1, y: 0 }, ma: 3 },
+    a2: { id: 'a2', owner: 'P1', pos: { x: 3, y: 0 }, initialPos: { x: 3, y: 0 }, ma: 3 },
+    b1: { id: 'b1', owner: 'P2', pos: { x: 1, y: 9 }, initialPos: { x: 1, y: 9 }, ma: 3 },
+    b2: { id: 'b2', owner: 'P2', pos: { x: 3, y: 9 }, initialPos: { x: 3, y: 9 }, ma: 3 },
   },
+  score: { P1: 0, P2: 0 },
 };
 
 function validateRequest(body: unknown, players: string[]): ProtocolRequest | null {
@@ -31,7 +27,6 @@ function validateRequest(body: unknown, players: string[]): ProtocolRequest | nu
   const b = body as Record<string, unknown>;
   if (typeof b.playerId !== 'string' || !players.includes(b.playerId)) return null;
   if (!Object.values(Action).includes(b.action as Action)) return null;
-  if (!(b.action as Action in actionProcessors)) return null;
   return { playerId: b.playerId, action: b.action as Action, arguments: b.arguments };
 }
 
@@ -54,7 +49,7 @@ app.post("/action", (req: Request, res: Response) => {
 
   let result: ProtocolResponse;
   try {
-    result = actionProcessors[request.action](gameState, request.playerId, request.arguments);
+    result = processAction(gameState, request.playerId, request.action, request.arguments);
   } catch {
     result = { state: gameState, events: [], errors: [ProtocolError.InvalidArguments], end_turn: false };
   }

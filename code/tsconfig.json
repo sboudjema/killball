@@ -1,4 +1,5 @@
 {
+  "rootDir": ".",
   "compilerOptions": {
     "target": "ES2020",
     "module": "CommonJS",

@@ -1,10 +1,18 @@
-import { GameState, ProtocolResponse, TurnState, TurnError, Position } from "./types";
-import { processMove } from "./move";
+import { GameState, ProtocolResponse, TurnState, TurnError, Position, Action } from "./types";
+import { processMove } from "./rules/movement/move";
+import { processScoring } from "./rules/scoring/scoring";
 
 type MoveAction = { type: 'move'; unitId: string; pos: Position };
-export type Action = MoveAction;
 
-export function submitAction(state: GameState, playerId: string, action: Action): ProtocolResponse {
+export function processAction(state: GameState, playerId: string, action: Action, args: unknown): ProtocolResponse {
+  if (action === Action.Move) {
+    const { unitId, pos } = args as { unitId: string; pos: Position };
+    return submitAction(state, playerId, { type: 'move', unitId, pos });
+  }
+  throw new Error(`Unknown action: ${action}`);
+}
+
+function submitAction(state: GameState, playerId: string, action: MoveAction): ProtocolResponse {
   // WAITING_FOR_ACTION: reject if wrong player
   if (playerId !== state.turn.player) {
     return { state, events: [], errors: [TurnError.NotYourTurn], end_turn: false };
@@ -26,8 +34,10 @@ export function submitAction(state: GameState, playerId: string, action: Action)
     ? state.players[(idx + 1) % state.players.length]
     : state.turn.player;
 
+  const scoredState = end_turn ? processScoring(result.state) : result.state;
+
   const finalState: GameState = {
-    ...result.state,
+    ...scoredState,
     turn: { player: nextPlayer, state: TurnState.WaitingForAction },
   };
 
