@@ -14,10 +14,12 @@ let gameState: GameState = {
     state: TurnState.WaitingForAction,
   },
   units: {
-    a1: { id: 'a1', owner: 'P1', pos: { x: 1, y: 0 }, initialPos: { x: 1, y: 0 }, ma: 3 },
+    a1: { id: 'a1', owner: 'P1', pos: { x: 2, y: 0 }, initialPos: { x: 2, y: 0 }, ma: 3 },
     a2: { id: 'a2', owner: 'P1', pos: { x: 3, y: 0 }, initialPos: { x: 3, y: 0 }, ma: 3 },
-    b1: { id: 'b1', owner: 'P2', pos: { x: 1, y: 9 }, initialPos: { x: 1, y: 9 }, ma: 3 },
+    a3: { id: 'a3', owner: 'P1', pos: { x: 4, y: 0 }, initialPos: { x: 4, y: 0 }, ma: 3 },
+    b1: { id: 'b1', owner: 'P2', pos: { x: 2, y: 9 }, initialPos: { x: 2, y: 9 }, ma: 3 },
     b2: { id: 'b2', owner: 'P2', pos: { x: 3, y: 9 }, initialPos: { x: 3, y: 9 }, ma: 3 },
+    b3: { id: 'b3', owner: 'P2', pos: { x: 4, y: 9 }, initialPos: { x: 4, y: 9 }, ma: 3 },
   },
   score: { P1: 0, P2: 0 },
 };

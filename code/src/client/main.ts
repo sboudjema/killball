@@ -3,6 +3,9 @@ import { Action } from '../engine/types';
 import { GRID_ROWS, GRID_COLUMNS } from '../engine/constants';
 import type { GameState, ProtocolResponse, Position } from '../engine/types';
 
+document.documentElement.style.setProperty('--grid-columns', String(GRID_COLUMNS));
+document.documentElement.style.setProperty('--grid-rows', String(GRID_ROWS));
+
 const grid = document.getElementById('grid')!;
 const errors = document.getElementById('errors')!;
 const currentPlayer = document.getElementById('current-player')!;
