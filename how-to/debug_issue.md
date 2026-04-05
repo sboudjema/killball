@@ -1,4 +1,4 @@
-# TEMPLATE: DEBUG_ISSUE
+# HOW-TO: DEBUG_ISSUE
 
 You are debugging a deterministic rules system.
 

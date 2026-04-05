@@ -1,6 +1,6 @@
 # SPEC: MOVE ACTION
 
-Version: v0.7
+Version: v0.8
 Status: draft
 
 ---
@@ -14,10 +14,11 @@ Defines how a unit moves from one tile to another.
 ## 2. Preconditions (Validation Rules)
 
 * Unit MUST exist
+* Unit MUST be owned by the current player
 * Target tile MUST NOT be occupied by another unit
 * Target tile MUST be within grid bounds
 * The path to the target tile MUST NOT go throught occupied tiles
-* The path length tile MUST NOT be longer than the units movement allowance (units can move diagonally at the same cost as orthogonally)
+* The path length MUST NOT be longer than the units movement allowance (units can move diagonally at the same cost as orthogonally)
 
 ---
 

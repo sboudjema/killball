@@ -1,4 +1,4 @@
-# TEMPLATE: REFACTOR_CODE
+# HOW-TO: REFACTOR_CODE
 
 You are refactoring code for clarity and correctness.
 

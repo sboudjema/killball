@@ -1,8 +1,12 @@
-# TEMPLATE: IMPLEMENT_SPEC
+# HOW-TO: IMPLEMENT_SPEC
 
 You are implementing a deterministic rules engine.
 
 Follow the spec EXACTLY.
+
+Preliminary tasks:
+
+* Review the spec: [how-to/review_spec.md](how-to/review_spec.md) |
 
 Constraints:
 
@@ -22,6 +26,3 @@ Requirements:
 After implementation:
 
 * List any assumptions made that are NOT in the spec
-
-Spec:
-[PASTE SPEC HERE]

@@ -1,4 +1,4 @@
-# TEMPLATE: REVIEW_SPEC
+# HOW-TO: REVIEW_SPEC
 
 You are reviewing a game rules spec for ambiguity and completeness.
 
