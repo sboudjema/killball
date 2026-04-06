@@ -36,17 +36,23 @@ grid.addEventListener('click', (e) => {
   const unitOnTile = unitDiv?.textContent ?? null;
 
   if (unitOnTile) {
-    selectedUnit = unitOnTile;
-    document.querySelectorAll('.cell').forEach(c => {
-      c.querySelector('.unit')?.classList.remove('selected');
-      c.classList.remove('reachable');
-    });
-    unitDiv!.classList.add('selected');
-    if (currentState) {
-      getReachableTiles(currentState, selectedUnit).forEach(({ x, y }) => {
-        const tile = document.querySelector<HTMLElement>(`.cell[data-x="${x}"][data-y="${y}"]`);
-        if (tile) tile.classList.add('reachable');
+    const clickedOwner = currentState ? Object.values(currentState.units).find(u => u.id === unitOnTile)?.owner : null;
+    const isOpposing = currentState && clickedOwner !== currentState.turn.player;
+    if (selectedUnit && isOpposing) {
+      attack(selectedUnit, unitOnTile);
+    } else {
+      selectedUnit = unitOnTile;
+      document.querySelectorAll('.cell').forEach(c => {
+        c.querySelector('.unit')?.classList.remove('selected');
+        c.classList.remove('reachable');
       });
+      unitDiv!.classList.add('selected');
+      if (currentState) {
+        getReachableTiles(currentState, selectedUnit).forEach(({ x, y }) => {
+          const tile = document.querySelector<HTMLElement>(`.cell[data-x="${x}"][data-y="${y}"]`);
+          if (tile) tile.classList.add('reachable');
+        });
+      }
     }
   } else if (selectedUnit) {
     move(selectedUnit, { x, y });
@@ -104,6 +110,19 @@ const move = (unitId: string, pos: Position) => {
       playerId: currentState.turn.player,
       action: Action.Move,
       arguments: { unitId, pos },
+    }),
+  });
+};
+
+const attack = (attackerId: string, defenderId: string) => {
+  if (!currentState) return;
+  return fetchAndRender('/action', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      playerId: currentState.turn.player,
+      action: Action.Attack,
+      arguments: { attackerId, defenderId },
     }),
   });
 };

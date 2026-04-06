@@ -1,18 +1,54 @@
-import { GameState, ProtocolResponse, TurnState, TurnError, Position, Action } from "./types";
+import { GameState, ProtocolResponse, TurnState, TurnError, Position, Action, Requirement, ResolvedContext, ActionDefinition } from "./types";
 import { processMove } from "./rules/movement/move";
+import { processAttack } from "./rules/combat/attack";
 import { processScoring } from "./rules/scoring/scoring";
 
-type MoveAction = { type: 'move'; unitId: string; pos: Position };
+// --- Requirement resolvers ---
 
-export function processAction(state: GameState, playerId: string, action: Action, args: unknown): ProtocolResponse {
-  if (action === Action.Move) {
-    const { unitId, pos } = args as { unitId: string; pos: Position };
-    return submitAction(state, playerId, { type: 'move', unitId, pos });
-  }
-  throw new Error(`Unknown action: ${action}`);
+const resolvers: Record<Requirement, () => ResolvedContext> = {
+  [Requirement.D6]: () => ({ roll: Math.floor(Math.random() * 6) + 1 }),
+};
+
+function resolveRequirements(requires: Requirement[]): ResolvedContext {
+  return requires.reduce((ctx, req) => {
+    const resolver = resolvers[req];
+    if (!resolver) throw new Error(`Missing resolver for requirement: ${req}`);
+    return { ...ctx, ...resolver() };
+  }, {} as ResolvedContext);
 }
 
-function submitAction(state: GameState, playerId: string, action: MoveAction): ProtocolResponse {
+// --- Action definitions ---
+
+const moveDefinition: ActionDefinition<{ unitId: string; pos: Position }> = {
+  requires: [],
+  execute: (state, { unitId, pos }) => processMove(state, unitId, pos),
+};
+
+const attackDefinition: ActionDefinition<{ attackerId: string; defenderId: string; roll: number }> = {
+  requires: [Requirement.D6],
+  execute: (state, { attackerId, defenderId, roll }) => processAttack(state, attackerId, defenderId, roll),
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const definitions: Record<Action, ActionDefinition<any>> = {
+  [Action.Move]: moveDefinition,
+  [Action.Attack]: attackDefinition,
+};
+
+// --- Entry point ---
+
+export function processAction(state: GameState, playerId: string, action: Action, args: unknown): ProtocolResponse {
+  const definition = definitions[action];
+  if (!definition) throw new Error(`Unknown action: ${action}`);
+
+  return submitAction(state, playerId, (s) => {
+    const resolvedContext = resolveRequirements(definition.requires);
+    const finalParams = { ...(args as object), ...resolvedContext };
+    return definition.execute(s, finalParams as never);
+  });
+}
+
+function submitAction(state: GameState, playerId: string, process: (s: GameState) => ProtocolResponse): ProtocolResponse {
   // WAITING_FOR_ACTION: reject if wrong player
   if (playerId !== state.turn.player) {
     return { state, events: [], errors: [TurnError.NotYourTurn], end_turn: false };
@@ -25,7 +61,7 @@ function submitAction(state: GameState, playerId: string, action: MoveAction): P
   };
 
   // Process action
-  const result = processMove(resolvingState, action.unitId, action.pos);
+  const result = process(resolvingState);
 
   // RESOLUTION_COMPLETE
   const end_turn = result.errors.length === 0;

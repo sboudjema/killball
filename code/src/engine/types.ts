@@ -35,7 +35,17 @@ export enum TurnState {
 }
 
 export enum Action {
-  Move = "MOVE",
+  Move   = "MOVE",
+  Attack = "ATTACK",
+}
+
+export enum AttackError {
+  AttackerNotFound = "ATTACKER_NOT_FOUND",
+  DefenderNotFound = "DEFENDER_NOT_FOUND",
+  NotYourUnit      = "NOT_YOUR_UNIT",
+  FriendlyFire     = "FRIENDLY_FIRE",
+  OutOfRange       = "OUT_OF_RANGE",
+  PushBlocked      = "PUSH_BLOCKED",
 }
 
 export enum TurnError {
@@ -47,6 +57,17 @@ export enum ProtocolError {
   InvalidArguments = "INVALID_ARGUMENTS",
 }
 
+export enum Requirement {
+  D6 = "D6",
+}
+
+export type ResolvedContext = Record<string, unknown>;
+
+export type ActionDefinition<P extends object = object> = {
+  requires: Requirement[];
+  execute: (state: GameState, params: P) => ProtocolResponse;
+};
+
 export type ProtocolRequest = {
   playerId: string;
   action: Action;
@@ -56,6 +77,6 @@ export type ProtocolRequest = {
 export type ProtocolResponse = {
   state: GameState;
   events: [];
-  errors: (MoveError | TurnError | ProtocolError)[];
+  errors: (MoveError | AttackError | TurnError | ProtocolError)[];
   end_turn: boolean;
 };

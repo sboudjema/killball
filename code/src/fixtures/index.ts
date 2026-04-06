@@ -35,6 +35,10 @@ export function move(unitId: string, pos: Position) {
   return { action: Action.Move, args: { unitId, pos } };
 }
 
+export function attack(attackerId: string, defenderId: string) {
+  return { action: Action.Attack, args: { attackerId, defenderId } };
+}
+
 export function runSequence(
   initialState: GameState,
   actions: Array<{ playerId: string; action: Action; args: unknown }>

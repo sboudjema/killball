@@ -133,8 +133,8 @@ describe("scoring: edge cases", () => {
 
 describe("scoring: sequence", () => {
   it("P1 scores then P2 scores, both scores reach 1", () => {
-    const u1 = unit("u1", "P1", { x: 2, y: 8 }, { ma: 1, initialPos: { x: 2, y: 1 } });
-    const u2 = unit("u2", "P2", { x: 2, y: 1 }, { ma: 1, initialPos: { x: 2, y: 8 } });
+    const u1 = unit("u1", "P1", { x: 2, y: 8 }, { ma: 1, initialPos: { x: 3, y: 1 } });
+    const u2 = unit("u2", "P2", { x: 2, y: 1 }, { ma: 1, initialPos: { x: 2, y: 1 } });
     const s = state([u1, u2], "P1");
 
     const finalState = runSequence(s, [

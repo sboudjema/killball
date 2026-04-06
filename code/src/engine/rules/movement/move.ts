@@ -31,7 +31,7 @@ function validateMove(state: GameState, unitId: string, pos: Position): MoveErro
   return errors;
 }
 
-function canReach(state: GameState, unitId: string, target: Position): boolean {
+export function canReach(state: GameState, unitId: string, target: Position): boolean {
   const unit = state.units[unitId];
   const blocked = new Set(
     Object.values(state.units).filter(u => u.id !== unitId).map(u => `${u.pos.x},${u.pos.y}`)
