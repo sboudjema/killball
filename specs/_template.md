@@ -41,7 +41,7 @@ Tile:
 
 ## 3. Inputs
 
-List all required inputs.
+Inputs to the pure rules engine (always server-side). These are NOT client inputs — do not conflate with what the client sends over HTTP.
 
 Example:
 
